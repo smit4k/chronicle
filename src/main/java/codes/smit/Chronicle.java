@@ -1,7 +1,10 @@
 package codes.smit;
 
+import codes.smit.database.DatabaseManager;
+import codes.smit.database.MessageRepository;
 import codes.smit.listeners.ArchiveListener;
 import codes.smit.listeners.CommandListener;
+import codes.smit.services.ArchiveService;
 
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -21,10 +24,16 @@ public class Chronicle extends ListenerAdapter {
             return;
         }
 
+
+        DatabaseManager dbManager = new DatabaseManager();
+        MessageRepository messageRepository = new MessageRepository(dbManager);
+        ArchiveService archiveService = new ArchiveService(messageRepository);
+
+
         JDABuilder.createDefault(token)
                 .enableIntents(GatewayIntent.MESSAGE_CONTENT)
                 .addEventListeners(new Chronicle())
-                .addEventListeners(new ArchiveListener())
+                .addEventListeners(new ArchiveListener(archiveService))
                 .addEventListeners(new CommandListener())
                 .build();
     }

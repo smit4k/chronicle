@@ -7,7 +7,11 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 public class ArchiveListener extends ListenerAdapter {
 
-    private final ArchiveService archiveService = new ArchiveService();
+    private final ArchiveService archiveService;
+
+    public ArchiveListener(ArchiveService archiveService) {
+        this.archiveService = archiveService;
+    }
 
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {

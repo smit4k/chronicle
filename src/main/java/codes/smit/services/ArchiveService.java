@@ -1,11 +1,18 @@
 package codes.smit.services;
 
+import codes.smit.database.MessageRepository;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
 
 import java.time.format.DateTimeFormatter;
 
 public class ArchiveService {
+
+    private final MessageRepository messageRepository;
+
+    public ArchiveService(MessageRepository messageRepository) {
+        this.messageRepository = messageRepository;
+    }
 
     public void archiveMessage(Message message) {
         User author = message.getAuthor();
@@ -32,6 +39,8 @@ public class ArchiveService {
 
         System.out.println("========================\n");
 
-        // TODO: Save to database here (JSON??)
+
+        // Save to message repository
+        messageRepository.saveMessage(message);
     }
 }
