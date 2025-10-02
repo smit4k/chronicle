@@ -2,6 +2,7 @@ package codes.smit.listeners;
 
 import codes.smit.services.ArchiveService;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
@@ -28,7 +29,7 @@ public class ArchiveListener extends ListenerAdapter {
             }
 
             archiveService.archiveMessage(replyMessage);
-            event.getMessage().reply("✅ Archived message from " + replyMessage.getAuthor().getAsMention()).queue();
+            replyMessage.addReaction(Emoji.fromUnicode("📜")).queue();
         }
     }
 }
