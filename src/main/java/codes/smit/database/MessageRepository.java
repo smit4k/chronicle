@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.entities.MessageReaction;
 import net.dv8tion.jda.api.entities.User;
 
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -95,5 +96,20 @@ public class MessageRepository {
         return reactions.stream()
                 .map(r -> r.getEmoji().getAsReactionCode() + ":" + r.getCount())
                 .collect(Collectors.joining(","));
+    }
+
+    public int getTotalMessagesArchived() {
+        String sql = "SELECT COUNT(*) FROM archived_messages";
+
+        try (PreparedStatement pstmt = dbManager.getConnection().prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            System.err.println("Failed to get total messages: " + e.getMessage());
+        }
+        return 0;
     }
 }

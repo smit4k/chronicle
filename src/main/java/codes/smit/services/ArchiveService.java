@@ -43,4 +43,8 @@ public class ArchiveService {
         // Save to message repository
         messageRepository.saveMessage(message);
     }
+
+    public int getTotalMessagesArchived() {
+        return messageRepository.getTotalMessagesArchived();
+    }
 }

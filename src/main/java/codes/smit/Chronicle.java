@@ -34,7 +34,7 @@ public class Chronicle extends ListenerAdapter {
                 .enableIntents(GatewayIntent.MESSAGE_CONTENT)
                 .addEventListeners(new Chronicle())
                 .addEventListeners(new ArchiveListener(archiveService))
-                .addEventListeners(new CommandListener())
+                .addEventListeners(new CommandListener(archiveService))
                 .build();
     }
 }
