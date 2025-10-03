@@ -112,4 +112,20 @@ public class MessageRepository {
         }
         return 0;
     }
+
+    public int getTotalMessagesFromChannel(String channelId) {
+        String sql = "SELECT COUNT(*) FROM archived_messages WHERE channel_id = ?";
+
+        try (PreparedStatement pstmt = dbManager.getConnection().prepareStatement(sql);) {
+            pstmt.setString(1, channelId);
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            System.err.println("Failed to get messages from channel: " + e.getMessage());
+        }
+        return 0;
+    }
 }

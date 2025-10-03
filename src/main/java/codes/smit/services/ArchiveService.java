@@ -47,4 +47,8 @@ public class ArchiveService {
     public int getTotalMessagesArchived() {
         return messageRepository.getTotalMessagesArchived();
     }
+
+    public int getTotalMessagesFromChannel(String channelId) {
+        return messageRepository.getTotalMessagesFromChannel(channelId);
+    }
 }

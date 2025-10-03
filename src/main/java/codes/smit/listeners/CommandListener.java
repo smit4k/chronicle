@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.session.ReadyEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 
 import codes.smit.database.MessageRepository;
@@ -27,6 +28,7 @@ public class CommandListener extends ListenerAdapter {
         jda.updateCommands().addCommands(
                 Commands.slash("ping", "Check the bot's response time"),
                 Commands.slash("archive_count", "Check the total messages archived")
+                        .addOption(OptionType.CHANNEL, "channel", "Count total messages from a specific channel", false)
         ).queue();
 
         System.out.println("Chronicle is ready!");
@@ -38,8 +40,17 @@ public class CommandListener extends ListenerAdapter {
             event.reply("Pong!").queue();
         }
         if (event.getName().equals("archive_count")) {
-            int total = archiveService.getTotalMessagesArchived();
-            event.reply("📊 Total archived messages: **" + total + "**").queue();
+            if (event.getOption("channel") != null) {
+                String channelId = event.getOption("channel").getAsChannel().getId();
+                String channelName = event.getOption("channel").getAsChannel().getName();
+
+                int total = archiveService.getTotalMessagesFromChannel(channelId);
+                event.reply("📊 Messages archived from <#" + channelId + ">: **" + total + "**").queue();
+            }
+            else {
+                int total = archiveService.getTotalMessagesArchived();
+                event.reply("📊 Total archived messages: **" + total + "**").queue();
+            }
         }
     }
 }
