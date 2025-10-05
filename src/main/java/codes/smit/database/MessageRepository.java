@@ -128,4 +128,20 @@ public class MessageRepository {
         }
         return 0;
     }
+
+    public int getTotalMessagesFromUser(String userId) {
+        String sql = "SELECT COUNT(*) FROM archived_messages WHERE author_id = ?";
+
+        try (PreparedStatement pstmt = dbManager.getConnection().prepareStatement(sql)) {
+            pstmt.setString(1, userId);
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            System.err.println("Failed to get messages from user: " + e.getMessage());
+        }
+        return 0;
+    }
 }

@@ -29,6 +29,7 @@ public class CommandListener extends ListenerAdapter {
                 Commands.slash("ping", "Check the bot's response time"),
                 Commands.slash("archive_count", "Check the total messages archived")
                         .addOption(OptionType.CHANNEL, "channel", "Count total messages from a specific channel", false)
+                        .addOption(OptionType.USER, "user", "Count the amount of messages a user has archived.", false)
         ).queue();
 
         System.out.println("Chronicle is ready!");
@@ -46,6 +47,11 @@ public class CommandListener extends ListenerAdapter {
 
                 int total = archiveService.getTotalMessagesFromChannel(channelId);
                 event.reply("📊 Messages archived from <#" + channelId + ">: **" + total + "**").queue();
+            }
+            else if (event.getOption("user") != null) {
+                String userId = event.getOption("user").getAsUser().getId();
+                int total = archiveService.getTotalMessagesFromUser(userId);
+                event.reply("📊 Messages archived from <@" + userId + ">: **" + total + "**").queue();
             }
             else {
                 int total = archiveService.getTotalMessagesArchived();
