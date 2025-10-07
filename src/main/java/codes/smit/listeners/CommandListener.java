@@ -38,7 +38,9 @@ public class CommandListener extends ListenerAdapter {
     @Override
     public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
         if (event.getName().equals("ping")) {
-            event.reply("Pong!").queue();
+            event.reply("Pong!")
+                    .setEphemeral(true)
+                    .queue();
         }
         if (event.getName().equals("archive_count")) {
             if (event.getOption("channel") != null) {
@@ -46,16 +48,22 @@ public class CommandListener extends ListenerAdapter {
                 String channelName = event.getOption("channel").getAsChannel().getName();
 
                 int total = archiveService.getTotalMessagesFromChannel(channelId);
-                event.reply("📊 Messages archived from <#" + channelId + ">: **" + total + "**").queue();
+                event.reply("📊 Messages archived from <#" + channelId + ">: **" + total + "**")
+                        .setEphemeral(true)
+                        .queue();
             }
             else if (event.getOption("user") != null) {
                 String userId = event.getOption("user").getAsUser().getId();
                 int total = archiveService.getTotalMessagesFromUser(userId);
-                event.reply("📊 Messages archived from <@" + userId + ">: **" + total + "**").queue();
+                event.reply("📊 Messages archived from <@" + userId + ">: **" + total + "**")
+                        .setEphemeral(true)
+                        .queue();
             }
             else {
                 int total = archiveService.getTotalMessagesArchived();
-                event.reply("📊 Total archived messages: **" + total + "**").queue();
+                event.reply("📊 Total archived messages: **" + total + "**")
+                        .setEphemeral(true)
+                        .queue();
             }
         }
     }
