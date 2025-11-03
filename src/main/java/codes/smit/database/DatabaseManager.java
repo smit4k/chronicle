@@ -34,8 +34,6 @@ public class DatabaseManager {
                 author_tag TEXT NOT NULL,
                 channel_id TEXT NOT NULL,
                 channel_name TEXT NOT NULL,
-                server_id TEXT NOT NULL,
-                server_name TEXT NOT NULL,
                 content TEXT,
                 timestamp TEXT NOT NULL,
                 is_edited INTEGER DEFAULT 0,

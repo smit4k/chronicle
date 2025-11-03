@@ -24,10 +24,10 @@ public class MessageRepository {
         String sql = """
             INSERT INTO archived_messages (
                 message_id, author_id, author_name, author_tag,
-                channel_id, channel_name, server_id, server_name,
-                content, timestamp, is_edited, edited_timestamp,
-                reactions, has_attachments, archived_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                channel_id, channel_name, content, timestamp, 
+                is_edited, edited_timestamp, reactions, 
+                has_attachments, archived_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """;
 
         try (PreparedStatement pstmt = dbManager.getConnection().prepareStatement(sql)) {
@@ -39,17 +39,15 @@ public class MessageRepository {
             pstmt.setString(4, author.getAsTag());
             pstmt.setString(5, message.getChannel().getId());
             pstmt.setString(6, message.getChannel().getName());
-            pstmt.setString(7, message.getGuild().getId());
-            pstmt.setString(8, message.getGuild().getName());
-            pstmt.setString(9, message.getContentRaw());
-            pstmt.setString(10, message.getTimeCreated()
+            pstmt.setString(7, message.getContentRaw());
+            pstmt.setString(8, message.getTimeCreated()
                     .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-            pstmt.setInt(11, message.isEdited() ? 1 : 0);
-            pstmt.setString(12, message.isEdited() ?
+            pstmt.setInt(9, message.isEdited() ? 1 : 0);
+            pstmt.setString(10, message.isEdited() ?
                     message.getTimeEdited().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) : null);
-            pstmt.setString(13, formatReactions(message.getReactions()));
-            pstmt.setInt(14, message.getAttachments().isEmpty() ? 0 : 1);
-            pstmt.setString(15, LocalDateTime.now()
+            pstmt.setString(11, formatReactions(message.getReactions()));
+            pstmt.setInt(12, message.getAttachments().isEmpty() ? 0 : 1);
+            pstmt.setString(13, LocalDateTime.now()
                     .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
 
             pstmt.executeUpdate();
