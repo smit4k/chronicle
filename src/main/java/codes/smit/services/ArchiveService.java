@@ -1,8 +1,10 @@
 package codes.smit.services;
 
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import codes.smit.database.MessageRepository;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 
 import java.time.format.DateTimeFormatter;
 
@@ -16,11 +18,17 @@ public class ArchiveService {
 
     public void archiveMessage(Message message) {
         User author = message.getAuthor();
+
         String content = message.getContentRaw();
         String messageId = message.getId();
         String channelName = message.getChannel().getName();
         String timestamp = message.getTimeCreated()
                 .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+
+        String serverId = null;
+        if (message.isFromGuild()) {
+            serverId = message.getGuildId(); // Not strictly needed for saveMessage, repo extracts it too
+        }
 
         System.out.println("=== ARCHIVING MESSAGE ===");
         System.out.println("Message ID: " + messageId);
@@ -31,15 +39,22 @@ public class ArchiveService {
 
         if (!message.getAttachments().isEmpty()) {
             System.out.println("Attachments:");
-            message.getAttachments().forEach(attachment -> {
-                System.out.println("  - " + attachment.getFileName() + " (" + attachment.getUrl() + ")");
-            });
+            message.getAttachments().forEach(attachment -> System.out
+                    .println("  - " + attachment.getFileName() + " (" + attachment.getUrl() + ")"));
         }
 
         System.out.println("========================\n");
 
-        // Save to message repository
         messageRepository.saveMessage(message);
+    }
+
+    public void archiveAllMessages(MessageChannel channel) {
+        channel.getIterableHistory()
+                .cache(false)
+                .forEach(message -> {
+                    archiveMessage(message); // archive the message
+                    message.addReaction(Emoji.fromUnicode("📜")).queue();
+                });
     }
 
     public int getTotalMessagesArchived() {

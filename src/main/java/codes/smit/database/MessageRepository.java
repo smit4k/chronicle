@@ -22,16 +22,20 @@ public class MessageRepository {
 
     public void saveMessage(Message message) {
         String sql = """
-            INSERT INTO archived_messages (
-                message_id, author_id, author_name, author_tag,
-                channel_id, channel_name, content, timestamp, 
-                is_edited, edited_timestamp, reactions, 
-                has_attachments, archived_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """;
+                    INSERT INTO archived_messages (
+                        message_id, author_id, author_name, author_tag,
+                        channel_id, channel_name, content, timestamp,
+                        is_edited, edited_timestamp, reactions,
+                        has_attachments, archived_at, server_id, server_name
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """;
 
         try (PreparedStatement pstmt = dbManager.getConnection().prepareStatement(sql)) {
             User author = message.getAuthor();
+
+            // Hardcode your server info
+            final String SERVER_ID = "YOUR_SERVER_ID_HERE";
+            final String SERVER_NAME = "YOUR_SERVER_NAME_HERE";
 
             pstmt.setString(1, message.getId());
             pstmt.setString(2, author.getId());
@@ -40,24 +44,25 @@ public class MessageRepository {
             pstmt.setString(5, message.getChannel().getId());
             pstmt.setString(6, message.getChannel().getName());
             pstmt.setString(7, message.getContentRaw());
-            pstmt.setString(8, message.getTimeCreated()
-                    .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+            pstmt.setString(8, message.getTimeCreated().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
             pstmt.setInt(9, message.isEdited() ? 1 : 0);
-            pstmt.setString(10, message.isEdited() ?
-                    message.getTimeEdited().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) : null);
+            pstmt.setString(10,
+                    message.isEdited()
+                            ? message.getTimeEdited().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+                            : null);
             pstmt.setString(11, formatReactions(message.getReactions()));
             pstmt.setInt(12, message.getAttachments().isEmpty() ? 0 : 1);
-            pstmt.setString(13, LocalDateTime.now()
-                    .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+            pstmt.setString(13, LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+            pstmt.setString(14, SERVER_ID); // Hardcoded server_id
+            pstmt.setString(15, SERVER_NAME); // Hardcoded server_name
 
             pstmt.executeUpdate();
 
-            // Save attachments if any
             if (!message.getAttachments().isEmpty()) {
                 saveAttachments(message);
             }
 
-            System.out.println("✓ Message saved to database: " + message.getId());
+            System.out.println("✓ Message saved: " + message.getId());
 
         } catch (SQLException e) {
             if (e.getMessage().contains("UNIQUE constraint failed")) {
@@ -70,9 +75,9 @@ public class MessageRepository {
 
     private void saveAttachments(Message message) {
         String sql = """
-            INSERT INTO attachments (message_id, filename, file_extension, url, size)
-            VALUES (?, ?, ?, ?, ?)
-        """;
+                    INSERT INTO attachments (message_id, filename, file_extension, url, size)
+                    VALUES (?, ?, ?, ?, ?)
+                """;
 
         try (PreparedStatement pstmt = dbManager.getConnection().prepareStatement(sql)) {
             for (Message.Attachment attachment : message.getAttachments()) {
@@ -89,7 +94,8 @@ public class MessageRepository {
     }
 
     private String formatReactions(List<MessageReaction> reactions) {
-        if (reactions.isEmpty()) return null;
+        if (reactions.isEmpty())
+            return null;
 
         return reactions.stream()
                 .map(r -> r.getEmoji().getAsReactionCode() + ":" + r.getCount())
@@ -100,7 +106,7 @@ public class MessageRepository {
         String sql = "SELECT COUNT(*) FROM archived_messages";
 
         try (PreparedStatement pstmt = dbManager.getConnection().prepareStatement(sql);
-             ResultSet rs = pstmt.executeQuery()) {
+                ResultSet rs = pstmt.executeQuery()) {
 
             if (rs.next()) {
                 return rs.getInt(1);
