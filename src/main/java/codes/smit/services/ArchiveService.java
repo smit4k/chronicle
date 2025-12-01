@@ -22,7 +22,6 @@ public class ArchiveService {
         String timestamp = message.getTimeCreated()
                 .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 
-
         System.out.println("=== ARCHIVING MESSAGE ===");
         System.out.println("Message ID: " + messageId);
         System.out.println("Author: " + author.getAsTag() + " (" + author.getId() + ")");
@@ -38,7 +37,6 @@ public class ArchiveService {
         }
 
         System.out.println("========================\n");
-
 
         // Save to message repository
         messageRepository.saveMessage(message);
